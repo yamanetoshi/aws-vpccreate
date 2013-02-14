@@ -68,11 +68,16 @@ describe AWS::Vpccreate do
       ec2.client.stub(:create_subnet).and_return(response)
     end
 
+    it 'vpc in vpcc is valid' do
+      vpcc.vpc.should be_a(AWS::EC2::VPC)
+      vpcc.vpc.id.should == 'vpc-12345'
+    end
+
     it 'calls #create_subnet on the client' do
       ec2.client.should_receive(:create_subnet).
         with(:vpc_id => vpc.id, :cidr_block => '10.0.0.0/16').
         and_return(response)
-      vpcc.create_subnet('10.0.0.0/16', :vpc => vpc)
+      vpcc.create_subnet('10.0.0.0/16')
     end
 
     it 'accepts an availability zone name' do
@@ -81,12 +86,12 @@ describe AWS::Vpccreate do
           :cidr_block => 'cidr-block',
           :availability_zone => 'abc'
        ).and_return(response)
-      subnet = vpcc.create_subnet('cidr-block', :vpc => vpc,
+      subnet = vpcc.create_subnet('cidr-block',
                                   :availability_zone => 'abc')
     end
 
     it 'returns a populated subnet' do
-      subnet = vpcc.create_subnet('192.0.0.0/16', :vpc => vpc)
+      subnet = vpcc.create_subnet('192.0.0.0/16')
       subnet.should be_a(AWS::EC2::Subnet)
       subnet.subnet_id.should == 'subnet-12345'
       subnet.vpc_id.should == 'vpc-12345'

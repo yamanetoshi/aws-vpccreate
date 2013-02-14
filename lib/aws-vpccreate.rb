@@ -5,6 +5,8 @@ require 'aws-sdk'
 
 module AWS
   class Vpccreate
+    attr_reader :vpc
+
     def initialize ec2
       @ec2 = ec2
       @vpc = nil
@@ -17,7 +19,7 @@ module AWS
     def create_subnet cidr_block, options = {}
       raise "no vpc instance" if @vpc == nil
 
-      options[:vpc => @vpc]
+      options[:vpc] = @vpc
       @ec2.subnets.create(cidr_block, options)
     end
 

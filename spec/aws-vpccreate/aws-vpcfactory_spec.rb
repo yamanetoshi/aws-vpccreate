@@ -37,13 +37,13 @@ describe AWS::VPCFactory do
       proc { AWS::VPCFactory.create(ec2, config) }.should raise_error
     end
 
-    it 'vpc_subnet is ""' do
+    it 'vpc_subnet is null-string' do
       config = {"vpc" => {"vpc_subnet" => ""}}
 
       proc { AWS::VPCFactory.create(ec2, config) }.should raise_error
     end
 
-    describe 'makes vpc and internet_gateway' do
+    describe 'makes vpc and internet_gateway only' do
       let(:create_response) { ec2.client.stub_for(:create_internet_gateway) }
       let(:attach_response) { ec2.client.stub_for(:attach_internet_gateway) }
 
@@ -54,7 +54,7 @@ describe AWS::VPCFactory do
         ec2.client.stub(:create_internet_gateway).and_return(create_response)
       end
 
-      it 'create vpc and internet_gateway only' do
+      it 'create vpc and create internet gateway and attach it to vpc' do
         vpc_config = {"vpc" => {"vpc_subnet" => "10.0.0.0/16"}}
 
         ec2.client.should_receive(:create_vpc).
@@ -93,7 +93,7 @@ describe AWS::VPCFactory do
         ec2.client.stub(:create_security_group).and_return(create_sg_response)
       end
 
-      it 'create vpc and ig and security gateway' do
+      it 'create security gateway' do
         vpc_config = {"vpc" => {"vpc_subnet" => "10.0.0.0/16",
             "security_group" => [{"name" =>"abc",
                                    "description" => "NAT"},
@@ -161,7 +161,7 @@ describe AWS::VPCFactory do
         ec2.client.stub(:create_route_table).and_return(create_route_response)
       end
 
-      it 'create vpc and ig and subnet and route' do
+      it 'create subnet and route' do
         vpc_config = {"vpc" => {"vpc_subnet" => "10.0.0.0/16",
             "subnets" => [{"subnet_addr" => "10.0.0.0/24",
                             "availability_zone" => "ap-northeast-1a"},
@@ -228,7 +228,7 @@ describe AWS::VPCFactory do
         ec2.client.stub(:create_route_table).and_return(create_route_response)
       end
 
-      it 'create vpc and ig and security gateway' do
+      it 'create all' do
         vpc_config = {"vpc" => {"vpc_subnet" => "10.0.0.0/16",
                         "subnets" => [{"subnet_addr" => "10.0.0.0/24",
                             "availability_zone" => "ap-northeast-1a"},

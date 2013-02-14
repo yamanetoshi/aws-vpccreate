@@ -29,6 +29,10 @@ describe AWS::Vpccreate do
         and_return(create_vpc_response)
 
       vpcc.create_vpc('10.0.0.0/16')
+
+      vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+        :subnets => [],
+        :security_group => []}}
     end
 
     it 'calls accept a different tenancy value' do
@@ -37,10 +41,19 @@ describe AWS::Vpccreate do
         and_return(create_vpc_response)
 
       vpcc.create_vpc('10.0.0.0/24', :instance_tenancy => :dedicated)
+
+      vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/24',
+        :subnets => [],
+        :security_group => []}}
     end
 
     it 'returns a VPC object' do
       vpc = vpcc.create_vpc('192.0.0.0/16')
+
+      vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '192.0.0.0/16',
+        :subnets => [],
+        :security_group => []}}
+
       vpc.should be_a(AWS::EC2::VPC)
       vpc.vpc_id.should == 'vpc-12345'
       vpc.cidr_block.should == '192.0.0.0/16'
@@ -78,6 +91,11 @@ describe AWS::Vpccreate do
         with(:vpc_id => vpc.id, :cidr_block => '10.0.0.0/16').
         and_return(response)
       vpcc.create_subnet('10.0.0.0/16')
+
+      vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+          :subnets => [{:subnet_addr => '10.0.0.0/16',
+                       :availability_zone => nil}],
+          :security_group => []}}
     end
 
     it 'accepts an availability zone name' do
@@ -88,10 +106,16 @@ describe AWS::Vpccreate do
        ).and_return(response)
       subnet = vpcc.create_subnet('cidr-block',
                                   :availability_zone => 'abc')
+
+      vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+          :subnets => [{:subnet_addr => 'cidr-block',
+                       :availability_zone => 'abc'}],
+          :security_group => []}}
     end
 
     it 'returns a populated subnet' do
       subnet = vpcc.create_subnet('192.0.0.0/16')
+
       subnet.should be_a(AWS::EC2::Subnet)
       subnet.subnet_id.should == 'subnet-12345'
       subnet.vpc_id.should == 'vpc-12345'
@@ -161,6 +185,10 @@ describe AWS::Vpccreate do
              :description => 'xyz',
              :vpc_id => vpc.id).and_return(response)
       sg = vpcc.create_sg('abc', :description => 'xyz')
+
+      vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+        :subnets => [],
+          :security_group => [{:name => 'abc', :description => 'xyz'}]}}
     end
 
     it 'returns an security gateway' do

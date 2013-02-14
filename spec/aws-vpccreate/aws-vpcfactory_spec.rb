@@ -75,6 +75,10 @@ describe AWS::VPCFactory do
 
         vpcf = AWS::VPCFactory.new ec2
         vpcf.create(vpc_config)
+
+        vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :subnets => [],
+            :security_group => []}}
       end
     end
 
@@ -121,6 +125,12 @@ describe AWS::VPCFactory do
 
         vpcf = AWS::VPCFactory.new ec2
         vpcf.create(vpc_config)
+
+        vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :subnets => [],
+            :security_group => [{:name => "abc", :description => "NAT"},
+                                {:name => "def", :description => "WEB"},
+                                {:name => "ghi", :description => "DB"}]}}
       end
     end
 
@@ -188,6 +198,15 @@ describe AWS::VPCFactory do
 
         vpcf = AWS::VPCFactory.new ec2
         vpcf.create(vpc_config)
+
+        vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :subnets => [{:subnet_addr => "10.0.0.0/24",
+                           :availability_zone => "ap-northeast-1a"},
+                         {:subnet_addr => "10.0.0.1/24",
+                           :availability_zone => "ap-northeast-1b"},
+                         {:subnet_addr => "10.0.0.2/24",
+                           :availability_zone => "ap-northeast-1c"}],
+            :security_group => []}}
       end
     end
 
@@ -262,6 +281,20 @@ describe AWS::VPCFactory do
 
         vpcf = AWS::VPCFactory.new ec2
         vpcf.create(vpc_config)
+
+        vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :subnets => [{:subnet_addr => "10.0.0.0/24",
+                           :availability_zone => "ap-northeast-1a"},
+                         {:subnet_addr => "10.0.0.1/24",
+                           :availability_zone => "ap-northeast-1b"},
+                         {:subnet_addr => "10.0.0.2/24",
+                           :availability_zone => "ap-northeast-1c"}],
+            :security_group => [{:name =>"abc",
+                                  :description => "NAT"},
+                                {:name =>"def",
+                                  :description => "WEB"},
+                                {:name =>"ghi",
+                                  :description => "DB"}]}}
       end
     end
   end

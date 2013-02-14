@@ -4,20 +4,45 @@ require 'aws-sdk'
 #require 'singleton'
 
 module AWS
+  class Logger
+    attr_reader :config_log
+
+    def initialize
+      @config_log = { :vpc => { :vpc_subnet => "",
+          :subnets => [],
+          :security_group => []}}
+    end
+
+    def put hash
+      if hash[:key] == :vpc_subnet
+        @config_log[:vpc][hash[:key]] = hash[:value]
+      else
+        @config_log[:vpc][hash[:key]].push hash[:value]
+      end
+    end
+  end
+
   class Vpccreate
-    attr_reader :vpc
+    attr_reader :vpc, :logger
 
     def initialize ec2
+      @logger = Logger.new
       @ec2 = ec2
       @vpc = nil
     end
 
     def create_vpc cidr_block, options = {}
+      @logger.put({:key => :vpc_subnet, :value => cidr_block})
+
       @vpc = @ec2.vpcs.create(cidr_block, options)
     end
 
     def create_subnet cidr_block, options = {}
       raise "no vpc instance" if @vpc == nil
+
+      @logger.put({:key => :subnets, 
+                    :value => {:subnet_addr => cidr_block,
+                      :availability_zone => options[:availability_zone]}})
 
       options[:vpc] = @vpc
       @ec2.subnets.create(cidr_block, options)
@@ -34,6 +59,10 @@ module AWS
     def create_sg name, options = {}
       raise "no vpc instance" if @vpc == nil
 
+      @logger.put({ :key => :security_group,
+                    :value => { :name => name, 
+                      :description => options[:description]}})
+
       options[:vpc] = @vpc
       @ec2.security_groups.create(name, options)
     end
@@ -47,6 +76,7 @@ module AWS
   end
 
   class VPCFactory
+    attr_reader :vpcc
 #    include Singleton
 
 #    def initialize

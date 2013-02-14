@@ -77,6 +77,7 @@ describe AWS::VPCFactory do
         vpcf.create(vpc_config)
 
         vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :vpc_id => 'vpc-12345',
             :subnets => [],
             :security_group => []}}
       end
@@ -127,6 +128,7 @@ describe AWS::VPCFactory do
         vpcf.create(vpc_config)
 
         vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :vpc_id => 'vpc-12345',
             :subnets => [],
             :security_group => [{:name => "abc", :description => "NAT"},
                                 {:name => "def", :description => "WEB"},
@@ -200,6 +202,7 @@ describe AWS::VPCFactory do
         vpcf.create(vpc_config)
 
         vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :vpc_id => 'vpc-12345',
             :subnets => [{:subnet_addr => "10.0.0.0/24",
                            :availability_zone => "ap-northeast-1a"},
                          {:subnet_addr => "10.0.0.1/24",
@@ -283,6 +286,7 @@ describe AWS::VPCFactory do
         vpcf.create(vpc_config)
 
         vpcf.vpcc.logger.config_log.should == {:vpc => {:vpc_subnet => '10.0.0.0/16',
+            :vpc_id => 'vpc-12345',
             :subnets => [{:subnet_addr => "10.0.0.0/24",
                            :availability_zone => "ap-northeast-1a"},
                          {:subnet_addr => "10.0.0.1/24",

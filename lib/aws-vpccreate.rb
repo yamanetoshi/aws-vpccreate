@@ -8,13 +8,16 @@ module AWS
     attr_reader :config_log
 
     def initialize
-      @config_log = { :vpc => { :vpc_subnet => "",
+      @config_log = { :vpc => { :vpc_subnet => "", 
+          :vpc_id => "",
           :subnets => [],
           :security_group => []}}
     end
 
     def put hash
       if hash[:key] == :vpc_subnet
+        @config_log[:vpc][hash[:key]] = hash[:value]
+      elsif hash[:key] == :vpc_id
         @config_log[:vpc][hash[:key]] = hash[:value]
       else
         @config_log[:vpc][hash[:key]].push hash[:value]
@@ -32,9 +35,12 @@ module AWS
     end
 
     def create_vpc cidr_block, options = {}
-      @logger.put({:key => :vpc_subnet, :value => cidr_block})
-
       @vpc = @ec2.vpcs.create(cidr_block, options)
+
+      @logger.put({:key => :vpc_subnet, :value => cidr_block})
+      @logger.put({:key => :vpc_id, :value => @vpc.id})
+
+      @vpc
     end
 
     def create_subnet cidr_block, options = {}

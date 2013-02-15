@@ -22,11 +22,11 @@ Or install it yourself as:
     require 'aws-sdk'
     require 'aws-vpccreate'
 	
-	AWS.config(YAML.load(File.read(File.join(File.dirname(__FILE__). 'aws.yml'))))
+	AWS.config(YAML.load(File.read(File.join(File.dirname(__FILE__), 'aws.yml'))))
 	ec2 = AWS::EC2.new
 	vpcf = AWS::VPCFactory.new(ec2)
 	
-	vpc_config = YAML.load(File.read(File.join(File.dirname(__FILE__). 'vpc.yml'))))
+	vpc_config = YAML.load(File.read(File.join(File.dirname(__FILE__), 'vpc.yml')))
 	vpcf.create(vpc_config)
 	
 	puts vpcf.vpcc.logger.config_log
